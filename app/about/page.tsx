@@ -248,7 +248,7 @@ export default function AboutPage() {
             <div className="relative aspect-square rounded-2xl overflow-hidden">
               <Image
                 src="https://images.unsplash.com/photo-1567401893414-76b7b1e5a7a5?w=600&q=80"
-                alt "Présentoir montures"
+                alt="Présentoir montures"
                 fill
                 className="object-cover"
               />
