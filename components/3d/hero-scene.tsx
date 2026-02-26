@@ -79,19 +79,23 @@ function Eyeglasses() {
         </mesh>
 
         {/* Bridge */}
-        <mesh position={[0, 0.3, 0]} material={frameMaterial}>
-          <cylinderGeometry args={[0.04, 0.04, 0.8, 16]} rotation={[0, 0, Math.PI / 2]} />
+        <mesh position={[0, 0.3, 0]} material={frameMaterial} rotation={[0, 0, Math.PI / 2]}>
+          <cylinderGeometry args={[0.04, 0.04, 0.8, 16]} />
         </mesh>
 
         {/* Left temple */}
-        <mesh position={[-2.05, 0.2, -0.8]} material={frameMaterial} rotation={[0, -0.3, 0]}>
-          <cylinderGeometry args={[0.03, 0.03, 2.5, 16]} rotation={[Math.PI / 2, 0, 0]} />
-        </mesh>
+        <group position={[-2.05, 0.2, -0.8]} rotation={[0, -0.3, 0]}>
+          <mesh material={frameMaterial} rotation={[Math.PI / 2, 0, 0]}>
+            <cylinderGeometry args={[0.03, 0.03, 2.5, 16]} />
+          </mesh>
+        </group>
 
         {/* Right temple */}
-        <mesh position={[2.05, 0.2, -0.8]} material={frameMaterial} rotation={[0, 0.3, 0]}>
-          <cylinderGeometry args={[0.03, 0.03, 2.5, 16]} rotation={[Math.PI / 2, 0, 0]} />
-        </mesh>
+        <group position={[2.05, 0.2, -0.8]} rotation={[0, 0.3, 0]}>
+          <mesh material={frameMaterial} rotation={[Math.PI / 2, 0, 0]}>
+            <cylinderGeometry args={[0.03, 0.03, 2.5, 16]} />
+          </mesh>
+        </group>
 
         {/* Nose pads */}
         <mesh position={[-0.5, -0.5, 0.3]} material={frameMaterial}>
