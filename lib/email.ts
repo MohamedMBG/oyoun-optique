@@ -1,9 +1,19 @@
-import { Resend } from "resend";
+import nodemailer from "nodemailer";
 import { formatDate, formatTime, timeWindowLabels, serviceTypeLabels } from "./utils";
 
-const resend = new Resend(process.env.RESEND_API_KEY);
+const transporter = nodemailer.createTransport({
+  host: process.env.SMTP_HOST || "smtp.gmail.com",
+  port: Number(process.env.SMTP_PORT) || 465,
+  secure: true, 
+  auth: {
+    user: process.env.SMTP_USER,
+    pass: process.env.SMTP_PASS,
+  },
+});
+
 const fromEmail = process.env.FROM_EMAIL || "contact@oyoun-optique.fr";
 const fromName = process.env.FROM_NAME || "O'YOUN Optique";
+const fromFormatted = `"${fromName}" <${fromEmail}>`;
 
 interface ReservationData {
   id: string;
@@ -60,7 +70,7 @@ export async function sendReservationAcknowledgment(data: ReservationData) {
     <div style="background-color: rgba(227, 178, 97, 0.1); border-radius: 12px; padding: 20px; margin: 24px 0;">
       <div style="${emailStyles.detailRow}">
         <div style="${emailStyles.detailLabel}">Service</div>
-        <div style="${emailStyles.detailValue}">${serviceTypeLabels[data.serviceType]}</div>
+        <div style="${emailStyles.detailValue}">${serviceTypeLabels[data.serviceType as keyof typeof serviceTypeLabels]}</div>
       </div>
       <div style="${emailStyles.detailRow}">
         <div style="${emailStyles.detailLabel}">Date souhaitée</div>
@@ -68,7 +78,7 @@ export async function sendReservationAcknowledgment(data: ReservationData) {
       </div>
       <div style="${emailStyles.detailRow}">
         <div style="${emailStyles.detailLabel}">Créneau préféré</div>
-        <div style="${emailStyles.detailValue}">${timeWindowLabels[data.preferredTimeWindow]}</div>
+        <div style="${emailStyles.detailValue}">${timeWindowLabels[data.preferredTimeWindow as keyof typeof timeWindowLabels]}</div>
       </div>
     </div>
     
@@ -86,13 +96,13 @@ export async function sendReservationAcknowledgment(data: ReservationData) {
   `;
 
   try {
-    await resend.emails.send({
-      from: `${fromName} <${fromEmail}>`,
+    const info = await transporter.sendMail({
+      from: fromFormatted,
       to: data.email,
       subject,
       html,
     });
-    return { success: true };
+    return { success: true, messageId: info.messageId };
   } catch (error) {
     console.error("Failed to send acknowledgment email:", error);
     return { success: false, error };
@@ -127,7 +137,7 @@ export async function sendReservationConfirmation(data: ReservationData) {
     <div style="background-color: rgba(16, 185, 129, 0.1); border: 1px solid rgba(16, 185, 129, 0.3); border-radius: 12px; padding: 20px; margin: 24px 0;">
       <div style="${emailStyles.detailRow}">
         <div style="${emailStyles.detailLabel}">Service</div>
-        <div style="${emailStyles.detailValue}">${serviceTypeLabels[data.serviceType]}</div>
+        <div style="${emailStyles.detailValue}">${serviceTypeLabels[data.serviceType as keyof typeof serviceTypeLabels]}</div>
       </div>
       <div style="${emailStyles.detailRow}">
         <div style="${emailStyles.detailLabel}">Date confirmée</div>
@@ -162,13 +172,13 @@ export async function sendReservationConfirmation(data: ReservationData) {
   `;
 
   try {
-    await resend.emails.send({
-      from: `${fromName} <${fromEmail}>`,
+    const info = await transporter.sendMail({
+      from: fromFormatted,
       to: data.email,
       subject,
       html,
     });
-    return { success: true };
+    return { success: true, messageId: info.messageId };
   } catch (error) {
     console.error("Failed to send confirmation email:", error);
     return { success: false, error };
@@ -221,13 +231,13 @@ export async function sendReservationDecline(data: ReservationData) {
   `;
 
   try {
-    await resend.emails.send({
-      from: `${fromName} <${fromEmail}>`,
+    const info = await transporter.sendMail({
+      from: fromFormatted,
       to: data.email,
       subject,
       html,
     });
-    return { success: true };
+    return { success: true, messageId: info.messageId };
   } catch (error) {
     console.error("Failed to send decline email:", error);
     return { success: false, error };
