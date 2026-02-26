@@ -1,0 +1,117 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// User model for admin authentication
+model User {
+  id        String     @id @default(cuid())
+  email     String     @unique
+  name      String?
+  password  String // hashed with bcrypt
+  role      Role       @default(ADMIN)
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+  auditLogs AuditLog[]
+}
+
+enum Role {
+  ADMIN
+  SUPER_ADMIN
+}
+
+// Reservation request model
+model ReservationRequest {
+  id                  String            @id @default(cuid())
+  status              ReservationStatus @default(PENDING)
+
+  // Service details
+  serviceType         ServiceType
+
+  // Preferred datetime (patient's preference)
+  preferredDate       DateTime
+  preferredTimeWindow TimeWindow
+
+  // Confirmed datetime (set by admin)
+  confirmedDateTime   DateTime?
+
+  // Patient details
+  fullName            String
+  email               String
+  phone               String
+  notes               String?
+
+  // Admin messages
+  adminMessage        String?
+
+  // Timestamps
+  createdAt           DateTime          @default(now())
+  updatedAt           DateTime          @updatedAt
+
+  // Audit logs
+  auditLogs           AuditLog[]
+
+  @@index([status])
+  @@index([createdAt])
+  @@index([email])
+}
+
+enum ReservationStatus {
+  PENDING
+  CONFIRMED
+  DECLINED
+}
+
+enum ServiceType {
+  EYE_EXAM
+  CONTACT_LENS_FITTING
+  LENS_CUSTOMIZATION
+  FRAME_FITTING
+  REPAIR_ADJUSTMENT
+}
+
+enum TimeWindow {
+  MORNING // 9h - 12h
+  AFTERNOON // 14h - 17h
+  EVENING // 17h - 19h
+}
+
+// Audit log for admin actions
+model AuditLog {
+  id            String              @id @default(cuid())
+  action        AuditAction
+  entityType    String // "ReservationRequest"
+  entityId      String // reservation ID
+
+  // Who performed the action
+  userId        String
+  user          User                @relation(fields: [userId], references: [id])
+
+  // Related reservation
+  reservationId String?
+  reservation   ReservationRequest? @relation(fields: [reservationId], references: [id])
+
+  // Change details
+  previousValue String? // JSON string of previous state
+  newValue      String? // JSON string of new state
+  message       String?
+
+  createdAt     DateTime            @default(now())
+
+  @@index([userId])
+  @@index([reservationId])
+  @@index([createdAt])
+}
+
+enum AuditAction {
+  CREATE
+  UPDATE
+  CONFIRM
+  DECLINE
+  LOGIN
+  LOGOUT
+}
