@@ -6,7 +6,7 @@ import { authOptions } from "@/lib/auth";
 import { sendReservationConfirmation } from "@/lib/email";
 
 const confirmSchema = z.object({
-  confirmedDateTime: z.string().datetime(),
+  confirmedDateTime: z.string(),
   message: z.string().max(500).optional(),
 });
 

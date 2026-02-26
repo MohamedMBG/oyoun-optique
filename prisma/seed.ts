@@ -4,13 +4,14 @@ import bcrypt from "bcryptjs";
 const prisma = new PrismaClient();
 
 async function main() {
-  // Check if admin already exists
   const existingAdmin = await prisma.user.findUnique({
     where: { email: "admin@oyoun-optique.fr" },
   });
 
   if (existingAdmin) {
-    console.log("Admin user already exists");
+    console.log("✅ Admin user already exists");
+    console.log("Email: admin@oyoun-optique.fr");
+    console.log("Password: admin123");
     return;
   }
 
@@ -25,15 +26,14 @@ async function main() {
     },
   });
 
-  console.log("Admin user created successfully");
+  console.log("✅ Admin user created successfully!");
   console.log("Email: admin@oyoun-optique.fr");
   console.log("Password: admin123");
-  console.log("Please change the password after first login!");
 }
 
 main()
   .catch((e) => {
-    console.error(e);
+    console.error("❌ Error:", e.message);
     process.exit(1);
   })
   .finally(async () => {

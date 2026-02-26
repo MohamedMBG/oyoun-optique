@@ -189,9 +189,11 @@ function Scene() {
         scale={10}
         blur={2}
         far={4}
+        resolution={256}
+        frames={1}
       />
       
-      <Environment preset="city" />
+      <Environment preset="city" resolution={256} />
     </>
   );
 }
@@ -202,7 +204,7 @@ export function HeroScene() {
     <div className="w-full h-full">
       <Suspense fallback={<HeroFallback />}>
         <Canvas
-          dpr={[1, 2]}
+          dpr={[1, 1.5]}
           gl={{
             antialias: true,
             alpha: true,
