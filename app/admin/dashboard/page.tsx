@@ -90,6 +90,7 @@ export default function AdminDashboardPage() {
     if (status === "authenticated") {
       fetchReservations();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [status]);
 
   const fetchReservations = async () => {
