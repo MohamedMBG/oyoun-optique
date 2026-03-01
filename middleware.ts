@@ -3,13 +3,11 @@ import { NextResponse } from "next/server";
 
 export default withAuth(
   function middleware(req) {
-    // Check if user is authenticated for admin routes
-    if (req.nextUrl.pathname.startsWith("/admin/dashboard")) {
-      const token = req.nextauth.token;
+    const token = req.nextauth.token;
 
-      if (!token) {
-        return NextResponse.redirect(new URL("/admin/login", req.url));
-      }
+    // Redirect unauthenticated users to login for any /admin route except the login page itself
+    if (!token && req.nextUrl.pathname !== "/admin/login") {
+      return NextResponse.redirect(new URL("/admin/login", req.url));
     }
 
     return NextResponse.next();
@@ -17,22 +15,19 @@ export default withAuth(
   {
     callbacks: {
       authorized({ req, token }) {
-        // Allow access to login page without authentication
+        // The login page is always accessible
         if (req.nextUrl.pathname === "/admin/login") {
           return true;
         }
 
-        // Require authentication for dashboard
-        if (req.nextUrl.pathname.startsWith("/admin/dashboard")) {
-          return token !== null;
-        }
-
-        return true;
+        // Every other /admin/* route requires a valid session token (LOW-1 fix)
+        return !!token;
       },
     },
   }
 );
 
 export const config = {
+  // Protect ALL /admin routes
   matcher: ["/admin/:path*"],
 };
